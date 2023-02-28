@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useAppDispatch } from "../store";
 import { addEmployeeAction } from "../employeeAction";
-import { useNavigate } from "react-router-dom";
- 
+import { Link, useNavigate } from "react-router-dom";
+import { Employee, employeeSchema } from "../model/model";
+
+import '../index.css';
+
 const AddUser = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch()
@@ -13,21 +16,47 @@ const AddUser = () => {
       gender: 'Male'
   })
   
-  const saveEmployee = (e: any) => {
-    e.preventDefault();
-    dispatch(addEmployeeAction(employee));
+  const [error, setError] = useState(false)
 
-    navigate("/");
+  const saveEmployee = async (e: any) => {
+    e.preventDefault();
+    if(error === true) return null
+    const validate = await employeeSchema.validate(employee)
+    .catch(errors => console.log(errors))
+    if(!validate) {
+      setError(true)
+      return null
+    }
+    
+    else{
+        dispatch(addEmployeeAction(employee));
+        navigate("/");
+      }
     
   };
-  
+  const { name, email, job, gender } = employee
   const onChangehandler = (e: any) => {
     const {name, value } = e.target;
+    if(name === "email") {
+      validateEmailWithCom({...employee, [name]: value })
+    }
     setEmployee({...employee, [name]: value })
   }
-  const { name, email, job, gender } = employee
+  
+ 
+  function validateEmailWithCom(employee: any) {
+    const regex = /^[^\s@]+@[^\s@]+\.com$/;
+    const err = regex.test(employee.email);
+    if(err === true ){return setError(false)}
+    else return setError(true)
+  }
+ 
   return (
-    <div className="columns mt-5">
+    <div className="columns mt-5" style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      }}>
       <div className="column is-half">
         <form onSubmit={saveEmployee}>
           <div className="field">
@@ -40,7 +69,9 @@ const AddUser = () => {
                 value={name}
                 onChange={onChangehandler}
                 placeholder="Name"
+                required
               />
+              
             </div>
           </div>
           <div className="field">
@@ -48,12 +79,14 @@ const AddUser = () => {
             <div className="control">
               <input
                 type="text"
-                className="input"
+                className= {`input  ${error === true ? 'error' :  ''}`}
                 name="email"
-                value={email}
+                value={email} 
                 onChange={onChangehandler}
                 placeholder="Email"
+                
               />
+              {error === true ? <div style={{color: "red", fontSize: "10px"}}>Invalid Email</div> : ""}
             </div>
           </div>
           <div className="field">
@@ -66,6 +99,7 @@ const AddUser = () => {
                 value={job}
                 onChange={onChangehandler}
                 placeholder="Job"
+                required
               />
             </div>
           </div>
@@ -77,6 +111,7 @@ const AddUser = () => {
                     name="gender"
                   value={gender}
                   onChange={onChangehandler}
+                  required
                 >
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -89,6 +124,9 @@ const AddUser = () => {
               <button type="submit" className="button is-success">
                 Save
               </button>
+              <Link to="/" className=" button is-danger" style={{marginLeft: '20px'}}>
+                  Back
+              </Link>
             </div>
           </div>
         </form>

@@ -1,7 +1,4 @@
-// import { EditFilled, DeleteFilled } from "@ant-design/icons";
-// import { Space } from "antd";
-// import { ColumnsType } from "antd/es/table";
-// import { Link } from "react-router-dom";
+import * as Yup from 'yup'
 
  export interface Employee{
   name: string,
@@ -18,38 +15,16 @@
     gender: string;
   }
   
-//   export const columns: ColumnsType<any> = [
-//     {
-//       title: 'Name',
-//       dataIndex: 'name',
-//       key: 'name',
-//     },
-//     {
-//       title: 'Job',
-//       dataIndex: 'job',
-//       key: 'job',
-//     },
-//     {
-//       title: 'Email',
-//       dataIndex: 'email',
-//       key: 'email',
-//     },
-//     {
-//       title: 'Gender',
-//       dataIndex: 'gender',
-//       key: 'gender',
-//     },
-//     {
-//       title: 'Action',
-//       key: 'action',
-//       render: () => (
-//         <Space size="middle"> 
-        
-//           <EditFilled />              
-            
-//           <DeleteFilled />       
-//         </Space>
-//       ),
-//     },
-//   ];
-  
+
+ export const employeeSchema = Yup.object().shape({
+    name: Yup.string().required('Name is required'),
+    job: Yup.string().required('Job is required'),
+    email: Yup.string().email('Invalid Email')
+    .test('no-spaces', 'Email must not contain spaces', (value) =>{
+      if(value){
+        return !/\s/.test(value)
+      }
+    })
+    .required('Email is required'),
+    gender: Yup.string().required('Gender is required'),
+  })

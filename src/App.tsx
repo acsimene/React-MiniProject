@@ -1,14 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { DeleteFilled, EditFilled, PlusSquareFilled, SearchOutlined } from '@ant-design/icons';
-import type { InputRef } from 'antd';
+import Icon, { DeleteTwoTone, EditFilled, PlusSquareFilled, SearchOutlined, WarningTwoTone } from '@ant-design/icons';
+import { InputRef, Modal } from 'antd';
 import { Button, Input, Space, Table } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterConfirmProps } from 'antd/es/table/interface';
-import { getEmployeeSelector, fetchEmployeeList, deleteEmployee } from './employeeReducer';
+import { getEmployeeSelector, fetchEmployeeList } from './employeeReducer';
 import { useAppSelector, useAppDispatch } from './store';
 import { DataType, Employee } from './model/model';
 import { Link } from 'react-router-dom';
 import { deleteEmployeeAction } from './employeeAction';
+
+
 
 
 
@@ -19,6 +21,7 @@ type DataIndex = keyof DataType;
 const App: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
+  const [visibility, setVisibility] = useState(false);
   const searchInput = useRef<InputRef>(null);
 
   const data =  useAppSelector(getEmployeeSelector)
@@ -100,13 +103,19 @@ const App: React.FC = () => {
         text
   });
 
-
+  const [employeeRemove, setEmployeeRemove] = useState<Employee>(
+    { name: '',
+      email: '',
+      job: '',
+      gender: 'Male'
+  })
 
   const removeEmployee = (employeetoRemove: any) => {
-      dispatch(deleteEmployeeAction(employeetoRemove))
+      setVisibility(true)
+      setEmployeeRemove(employeetoRemove)
   }
 
-
+ 
   const columns: any = [
     {
       title: 'Name',
@@ -144,9 +153,9 @@ const App: React.FC = () => {
         <Link to={`edit/${data._id}`}>
           <EditFilled />              
         </Link>
-        <a style={{textDecoration: "none", cursor: "pointer"}}
+        <a style={{ cursor: "pointer"}}
           onClick={ () => removeEmployee(data)}>
-        <DeleteFilled />   
+        <DeleteTwoTone twoToneColor="#eb2f96"/>   
         </a>  
             
     </Space>
@@ -154,9 +163,31 @@ const App: React.FC = () => {
     },
 
   ];
-
+  const closeModal = (): void => {
+    setVisibility(false);
+  } 
+  const handleOk = () => {
+    dispatch(deleteEmployeeAction(employeeRemove))
+        closeModal();
+  };
   return (
     <>
+    <Modal
+        title={
+          <span>
+            <WarningTwoTone twoToneColor="#fadb14"  style={{fontSize: "24px"}}/> Delete Confirmation
+          </span>
+        }
+        open={visibility}
+        onOk={handleOk}
+        onCancel={closeModal}
+        okText="Confirm"
+        cancelText="Cancel"
+        
+        > 
+        <p>Are you sure you want to delete {employeeRemove.name}'s data? </p>
+        
+      </Modal>
   <Link to="add" style={{marginLeft: "85%" }}>   Add Employee <PlusSquareFilled /> </Link>
   <Table columns={columns} dataSource={data} />
    </>
@@ -167,38 +198,3 @@ export default App;
 
 
 
-
-// import {  Table } from 'antd';
-// import { columns, Employee } from './model/model';
-// import { fetchEmployeeList, getEmployeeSelector } from './employeeReducer';
-// import { useAppDispatch, useAppSelector } from './store';
-// import { useEffect } from 'react';
-// import { PlusSquareFilled } from '@ant-design/icons';
-// import { Link } from 'react-router-dom';
-
-
-
-// const App = () => {
-
-// const data =  useAppSelector(getEmployeeSelector)
-// const dispatch = useAppDispatch();
-
-// useEffect(() => {
-//     dispatch(fetchEmployeeList())
-// },[])
-
-// return(
-// <>
-
-// <Link to="add" style={{marginLeft: "85%" }}>   Add Employee <PlusSquareFilled /> </Link>
-// <Table 
-// columns={columns} 
-// dataSource={data} />
-
-// </>
-// )
-// } 
-
-  
-
-// export default App;

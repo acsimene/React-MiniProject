@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch } from "../store";
 import { editEmployeeAction } from "../employeeAction";
  
@@ -38,7 +38,11 @@ const EditUser = () => {
   const {name, job, email, gender} = employee
   
   return (
-    <div className="columns mt-5">
+    <div className="columns mt-5" style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      }}>
       <div className="column is-half">
         <form onSubmit={updateUser}>
           <div className="field">
@@ -100,6 +104,9 @@ const EditUser = () => {
               <button type="submit" className="button is-success">
                 Update
               </button>
+              <Link to="/" className=" button is-danger" style={{marginLeft: '20px'}}>
+                  Back
+              </Link>
             </div>
           </div>
         </form>
